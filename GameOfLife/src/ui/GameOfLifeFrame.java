@@ -1,12 +1,13 @@
 package ui;
 
-import model.CellMatrix;
-import util.Utils;
+import model.Configuration;
+import model.EvolutionaryAgent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,12 +28,16 @@ public class GameOfLifeFrame extends JFrame {
 
     private final int MAXIMUM_GENARATION = 1000;
 
-    private CellMatrix cellMatrix;
+
     private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
     private JPanel gridPanel = new JPanel();
 
     private JPanel[][] pnMatrix;
 
+    private Configuration bestPattern;
+    private EvolutionaryAgent myAgent;
+
+    private HashMap<String,Integer> scoreMap;
 
 
 
@@ -46,7 +51,11 @@ public class GameOfLifeFrame extends JFrame {
         getContentPane().add("North", buttonPanel);
 
 
-        cellMatrix = Utils.initMatrixFromFile();
+        //cellMatrix = Utils.initMatrixFromFile();
+        myAgent = new EvolutionaryAgent(5);
+        bestPattern = myAgent.evolvePattern(true);
+        myAgent.displayPattern(bestPattern);
+
         initGridLayout();
         showMatrix();
         gridPanel.updateUI();
@@ -59,10 +68,10 @@ public class GameOfLifeFrame extends JFrame {
 
     private void showMatrix() {
 
-        int[][] matrix = cellMatrix.getMatrix();
+        boolean[][] matrix = bestPattern.getConfigMatrix();
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[0].length; x++) {
-                if (matrix[y][x] == 1) {
+                if (matrix[y][x]) {
                     pnMatrix[y][x].setBackground(Color.PINK);
                 } else {
                     pnMatrix[y][x].setBackground(Color.WHITE);
@@ -76,8 +85,9 @@ public class GameOfLifeFrame extends JFrame {
      * Show grid layout
      */
     private void initGridLayout() {
-        int rows = cellMatrix.getHeight();
-        int cols = cellMatrix.getWidth();
+
+        int rows = bestPattern.getMatrixHeight();
+        int cols = bestPattern.getMatrixWidth();
         gridPanel = new JPanel();
         gridPanel.setLayout(new GridLayout(rows, cols));
         pnMatrix = new JPanel[rows][cols];
@@ -115,8 +125,23 @@ public class GameOfLifeFrame extends JFrame {
         @Override
         public void run() {
 
+            int totalScore = 0;
+            myAgent.myGrid.setStartingConfiguration(bestPattern);
 
-            while (!stop) {
+            while(!stop){
+                scoreMap = new HashMap<>();
+                totalScore += myAgent.myGrid.nextGen();
+                showMatrix2();
+
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+
+           /* while (!stop) {
                 if((cellMatrix.getTotalGeneration()+1)==MAXIMUM_GENARATION){
                     stop=true;
                 }
@@ -129,8 +154,22 @@ public class GameOfLifeFrame extends JFrame {
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
-            }
+            }*/
 
+        }
+    }
+
+    public void showMatrix2(){
+        boolean[][] matrix = myAgent.myGrid.getCellMatrix();
+        for (int y = 1; y < matrix.length -1; y++) {
+            for (int x = 1; x < matrix.length-1; x++) {
+                if (matrix[y][x]) {
+                    pnMatrix[y-1][x-1].setBackground(Color.PINK);
+                } else {
+                    pnMatrix[y-1][x-1].setBackground(Color.WHITE);
+                    pnMatrix[y-1][x-1].setBorder(BorderFactory.createLineBorder(Color.PINK));
+                }
+            }
         }
     }
 
