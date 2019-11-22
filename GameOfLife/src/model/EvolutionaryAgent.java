@@ -1,8 +1,4 @@
-package model;/*
-EvolutionaryAgent class applies an evolutionary algorithm to Conway's Game of
-Life to evolve interesting patterns. This class manages the population,
-selection, and mutation.
- */
+package model;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,6 +6,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * EvolutionaryAgent class applies an evolutionary algorithm to Conway's Game of
+ * Life to evolve interesting patterns. This class manages the population,
+ * selection, and mutation.
+ */
 public class EvolutionaryAgent {
     public CellGrid myGrid;
     private Configuration[] population;
@@ -18,15 +19,16 @@ public class EvolutionaryAgent {
     private int gridHeight = 16;
     private int gridWidth = 16;
 
-    private int popSize = 200;
+    private int popSize = 1000;
     private int numGens = 100;
     private int numGameGens = 50;
     private int numElites = 20;
     private int tournamentSize = 40;
 
+    private int liveChance = 50;
     private int mutationChance = 5;
     private int crossoverChance = 5;
-    private double hyperMutationPercentThresh = 0.9;
+
 
     public EvolutionaryAgent() {
         myGrid = new CellGrid(gridHeight, gridWidth);
@@ -61,7 +63,7 @@ public class EvolutionaryAgent {
 
     public static void main(String args[]) {
         EvolutionaryAgent myAgent = new EvolutionaryAgent(5);
-        Configuration bestPattern = myAgent.evolvePattern(true);
+        Configuration bestPattern = myAgent.evolvePattern();
         myAgent.displayPattern(bestPattern);
         System.out.println(bestPattern.getScore());
         myAgent.myGrid.viewSimulation(true, 5, bestPattern);
@@ -85,7 +87,7 @@ public class EvolutionaryAgent {
             for (int run = 0; run < numRuns; run++) {
                 System.out.println("Run " + String.valueOf(run + 1) + " for gen. size of " +
                         String.valueOf(genNumList[genNumIndex]));
-                Configuration bestConfig = testAgent.evolvePattern(true);
+                Configuration bestConfig = testAgent.evolvePattern();
                 bestFitnessTotal += bestConfig.getScore();
             }
             averageFitnesses[genNumIndex] = bestFitnessTotal/20;
@@ -107,7 +109,7 @@ public class EvolutionaryAgent {
         System.out.println("========================\nTest 3: Hypermutation");
         for (int run = 0; run < numRuns; run++) {
             System.out.println("Run " + String.valueOf(run + 1));
-            Configuration bestConfig = testAgent.evolvePattern(true);
+            Configuration bestConfig = testAgent.evolvePattern();
             bestFitnesses[run] = bestConfig.getScore();
             System.out.println("The best fitness of Run " + String.valueOf(run + 1) +
                     " is: " + String.valueOf(bestFitnesses[run]));
@@ -130,7 +132,7 @@ public class EvolutionaryAgent {
 
     public void displayPattern(Configuration config) {
         myGrid.setStartingConfiguration(config);
-        myGrid.printGrid();
+        //myGrid.printGrid();
     }
 
     private void generateStartingPopulation() {
@@ -141,9 +143,9 @@ public class EvolutionaryAgent {
         }
     }
 
-    private void initializePopulation() {
+    private void initializePopulation(int liveChance) {
         for (int i = 0; i < popSize; i++) {
-            population[i].setRandomConfiguration(10);
+            population[i].setRandomConfiguration(liveChance);
         }
     }
 
@@ -179,11 +181,11 @@ public class EvolutionaryAgent {
         crossoverChance = 5;
     }
 
-    public Configuration evolvePattern(boolean withHyperMutation) {
+    public Configuration evolvePattern() {
         //Initialize individuals in the population with gridHeight and gridWidth
         generateStartingPopulation();
         //Set initial status randomly of cells in each individual
-        initializePopulation();
+        initializePopulation(liveChance);
         double oldAvgFitness = 1;
         double newAvgFitness = 1;
         boolean hyperMutationTriggered = false;
@@ -201,7 +203,7 @@ public class EvolutionaryAgent {
             sortPopulation();
 
             // Optional triggered hypermutation
-            if (withHyperMutation) {
+            /*if (withHyperMutation) {
                 //Get average score of the population
                 newAvgFitness = calcAvgFitness();
                 if (hyperMutationTimer > 10) {
@@ -214,7 +216,7 @@ public class EvolutionaryAgent {
                 }
                 hyperMutationTimer++;
                 oldAvgFitness = newAvgFitness;
-            }
+            }*/
 
 
             // Selection (w/ elitism)

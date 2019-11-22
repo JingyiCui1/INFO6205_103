@@ -1,5 +1,6 @@
 package ui;
 
+import model.CellGrid;
 import model.Configuration;
 import model.EvolutionaryAgent;
 
@@ -51,10 +52,9 @@ public class GameOfLifeFrame extends JFrame {
         getContentPane().add("North", buttonPanel);
 
 
-        //cellMatrix = Utils.initMatrixFromFile();
         myAgent = new EvolutionaryAgent(5);
-        bestPattern = myAgent.evolvePattern(true);
-        myAgent.displayPattern(bestPattern);
+        bestPattern = myAgent.evolvePattern();
+
 
         initGridLayout();
         showMatrix();
@@ -130,10 +130,63 @@ public class GameOfLifeFrame extends JFrame {
 
             while(!stop){
                 scoreMap = new HashMap<>();
+                boolean[][] oldMatrix = myAgent.myGrid.getCellMatrix();
+                boolean[][] temp=new boolean[18][18];
+                for(int i=0;i<oldMatrix.length;i++) {
+                    for (int j = 0; j < oldMatrix.length; j++) {
+                          temp[i][j]=oldMatrix[i][j];
+                    }
+                }
+
+
+              /* System.out.println("Matrix1");
+                for(int i=0;i<oldMatrix.length;i++){
+                    for(int j=0;j<oldMatrix.length;j++){
+                        if(oldMatrix[i][j]){
+                            System.out.print("1 ");
+                        }else{
+                            System.out.print("0 ");
+                        }
+
+                    }
+                    System.out.println();
+                }*/
                 totalScore += myAgent.myGrid.nextGen();
+                boolean[][] newMatrix= myAgent.myGrid.getCellMatrix();
+              /* System.out.println("Matrix2");
+                for(int i=0;i<newMatrix.length;i++){
+                    for(int j=0;j<newMatrix.length;j++){
+                        if(newMatrix[i][j]){
+                            System.out.print("1 ");
+                        }else{
+                            System.out.print("0 ");
+                        }
+
+                    }
+                    System.out.println();
+                }*/
+
+
+               int stopStatus = myAgent.myGrid.stopCheck(temp,newMatrix);
+               if(stopStatus==1){
+                    stop=true;
+                    System.out.println("There is no cell any more. Game Over!");
+                    break;
+                }else if(stopStatus==2){
+                    stop=true;
+                    System.out.println("The generation number is larger than the maximum number. Game Over!");
+                    break;
+                }else if(stopStatus==3){
+                    stop=true;
+                    System.out.println("The status is the same as the previous one. Game Over!");
+                    break;
+                }
+
+                generationText.setText("Total generations: "+myAgent.myGrid.getGenCount());
                 showMatrix2();
 
-                try {
+
+               try {
                     TimeUnit.MILLISECONDS.sleep(500);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
@@ -161,13 +214,13 @@ public class GameOfLifeFrame extends JFrame {
 
     public void showMatrix2(){
         boolean[][] matrix = myAgent.myGrid.getCellMatrix();
-        for (int y = 1; y < matrix.length -1; y++) {
-            for (int x = 1; x < matrix.length-1; x++) {
-                if (matrix[y][x]) {
-                    pnMatrix[y-1][x-1].setBackground(Color.PINK);
+        for (int row = 1; row < matrix.length -1; row++) {
+            for (int col = 1; col < matrix.length-1; col++) {
+                if (matrix[row][col]) {
+                    pnMatrix[row-1][col-1].setBackground(Color.PINK);
                 } else {
-                    pnMatrix[y-1][x-1].setBackground(Color.WHITE);
-                    pnMatrix[y-1][x-1].setBorder(BorderFactory.createLineBorder(Color.PINK));
+                    pnMatrix[row-1][col-1].setBackground(Color.WHITE);
+                    pnMatrix[row-1][col-1].setBorder(BorderFactory.createLineBorder(Color.PINK));
                 }
             }
         }

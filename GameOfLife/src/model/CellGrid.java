@@ -1,4 +1,5 @@
-package model; /**
+package model;
+/**
  * cellGrid class Implementation
  *
  *
@@ -43,15 +44,21 @@ public class CellGrid {
     private HashMap<String, Boolean> liveDieTable;
     private HashMap<String, Integer> scoreMap;
     private int genCount = 0;
+    private final int MAX_GENERATION_COUNT = 10000;
+
 
     public boolean[][] getCellMatrix() {
         return cellMatrix;
     }
 
+    public int getGenCount() {
+        return genCount;
+    }
+
     /*
-        Returns a cellGrid object.
-        @return the cellGrid object
-         */
+            Returns a cellGrid object.
+            @return the cellGrid object
+             */
     public CellGrid() {
         cellMatrix = new boolean[gridHeight][gridWidth];
         liveDieTable = new HashMap<String, Boolean>();
@@ -147,6 +154,7 @@ public class CellGrid {
      * @param initialConfig
      */
     public void setStartingConfiguration(Configuration initialConfig) {
+        genCount=0;
         for (int row = 1; row < gridHeight - 1; row++) {
             for (int col = 1; col < gridWidth - 1; col++) {
                 cellMatrix[row][col] = initialConfig.getCell(row-1, col-1);
@@ -239,6 +247,7 @@ public class CellGrid {
             }
         }
         updateCellMatrix(cellMatrixNew);
+        genCount++;
         return score;
     }
 
@@ -451,6 +460,51 @@ public class CellGrid {
         if (isAliveNextGen(neighborhood)) {
             System.out.println("Will Be Alive");
         } else { System.out.println("will die");}
+    }
+
+    /**
+     * Stop conditions
+     * 1. There is no live cell in the matrix
+     * 2. The generation number is larger than the maximum generation number
+     * 3. The current status of individual is the same as the last status
+     */
+
+    public int stopCheck(boolean[][] oldMatrix,boolean[][] newMatrix){
+
+        if(getGenCount()>MAX_GENERATION_COUNT) return 2;
+
+        if(countLiveCell()==0) return 1;
+
+        if(equalCheck(oldMatrix,newMatrix)){
+            return 3;
+        }
+
+        return 0;
+    }
+
+    private boolean equalCheck(boolean[][] matrix1,boolean[][] matrix2){
+
+        for(int row=1;row<gridHeight-1;row++){
+            for(int col=1;col<gridWidth-1;col++){
+                if(matrix1[row][col]!=matrix2[row][col]){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private int countLiveCell(){
+        int countLive = 0;
+        for(int row=1;row<gridHeight-1;row++){
+            for(int col=1;col<gridWidth-1;col++){
+                if(cellMatrix[row][col]){
+                    countLive++;
+                }
+            }
+        }
+        return countLive;
     }
 
 }

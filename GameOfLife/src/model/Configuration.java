@@ -74,6 +74,7 @@ public class Configuration implements Comparable<Configuration>{
     public void setRandomConfiguration(int cellChanceToLive)  {
         if (cellChanceToLive > 100) {
             cellChanceToLive = 100;
+
         } else {
             if (cellChanceToLive < 0) {
                 cellChanceToLive = 0;
