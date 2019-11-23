@@ -28,18 +28,13 @@ package model;
  */
 
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Scanner;
 
 
 public class CellGrid {
-    // Instance Variables
-    private int gridHeight = 14;
-    private int gridWidth = 14;
+
+    private int gridHeight;
+    private int gridWidth;
     private boolean[][] cellMatrix;
     private HashMap<String, Boolean> liveDieTable;
     private HashMap<String, Integer> scoreMap;
@@ -47,35 +42,14 @@ public class CellGrid {
     private final int MAX_GENERATION_COUNT = 10000;
 
 
-    public boolean[][] getCellMatrix() {
-        return cellMatrix;
-    }
-
-    public int getGenCount() {
-        return genCount;
-    }
-
     /*
-            Returns a cellGrid object.
-            @return the cellGrid object
-             */
-    public CellGrid() {
-        cellMatrix = new boolean[gridHeight][gridWidth];
-        liveDieTable = new HashMap<String, Boolean>();
-        scoreMap = new HashMap<String, Integer>();
-        String tempNeighborhood = "";
-        initializeLiveDieTable(0, tempNeighborhood);
-    }
-
-
-    /*
-    Returns a cellGrid object. Note that the user dimensions are increased by
-    two - this is specific to the implementation and should not affect the
-    user's experience.
-    @param gridHeight    the int number of rows in the grid.
-    @param gridWidth     the int number of columns in the grid.
-    @return the cellGrid object
-     */
+   Returns a cellGrid object. Note that the user dimensions are increased by
+   two - this is specific to the implementation and should not affect the
+   user's experience.
+   @param gridHeight    the int number of rows in the grid.
+   @param gridWidth     the int number of columns in the grid.
+   @return the cellGrid object
+    */
     public CellGrid(int gridHeight, int gridWidth) {
         this.gridHeight = gridHeight + 2;
         this.gridWidth = gridWidth + 2;
@@ -89,58 +63,28 @@ public class CellGrid {
     }
 
     /*
-    Main function for program - can be used for testing or regular use.
-     */
-    public static void main(String args[]) {
-        CellGrid myGrid = new CellGrid(12, 12);
-
-        Configuration startingConfig = myGrid.loadStartingConfig("startingConfig.txt");
-        myGrid.setStartingConfiguration(startingConfig);
-        //myGrid.runGame(5);
-
-        //boolean[][] startingConfig = new boolean[12][12];
-        //myGrid.setStartingConfiguration(startingConfig);
-
-        double score = myGrid.runGame(10, true);
-        System.out.println("Final Score: " + String.valueOf(score));
-
+        Returns a cellGrid object.
+        @return the cellGrid object
+         */
+    public CellGrid() {
+        cellMatrix = new boolean[gridHeight][gridWidth];
+        liveDieTable = new HashMap<String, Boolean>();
+        scoreMap = new HashMap<String, Integer>();
+        String tempNeighborhood = "";
+        initializeLiveDieTable(0, tempNeighborhood);
     }
 
-    /*
-    Citation: https://stackoverflow.com/questions/18551251/how-to-open-a-text-file
-     */
-    public Configuration loadStartingConfig(String fileName) {
-        String line = null;
-        Configuration startingConfig = new Configuration(gridHeight, gridWidth);
-        int lineCounter = 0;
 
-        try {
-            // FileReader reads text files in the default encoding.
-            FileReader fileReader = new FileReader(fileName);
-
-            // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while((line = bufferedReader.readLine()) != null) {
-                for (int i = 0; i < line.length(); i++) {
-                    if (line.charAt(i) == '1') {
-                        startingConfig.setCell(lineCounter, i, true);
-                    }
-                }
-                lineCounter++;
-            }
-
-            // Always close files.
-            bufferedReader.close();
-        }
-        catch(FileNotFoundException ex) {
-            System.out.println("Unable to open file '" + fileName + "'");
-        }
-        catch(IOException ex) {
-            System.out.println("Error reading file '" + fileName + "'");
-        }
-        return startingConfig;
+    public boolean[][] getCellMatrix() {
+        return cellMatrix;
     }
+
+    public int getGenCount() {
+        return genCount;
+    }
+
+
+
 
     /*
     Sets the initial configuration of living and dead cells on the cellMatrix.
@@ -162,33 +106,13 @@ public class CellGrid {
         }
     }
 
-    public void clearCellMatrix() {
-        for (int row = 0; row < gridHeight; row++) {
-            for (int col = 0; col < gridWidth; col++) {
-                cellMatrix[row][col] = false;
-            }
-        }
-    }
 
-    public double runGame(int numGenerations, boolean printToTerminal) {
+    public double runGame(int numGenerations) {
         int totalScore = 0;
-
-        if (printToTerminal) {
-            System.out.println("Welcome to the Game of Life. Here is your starting configuration:");
-            printGrid();
-        }
 
         for (int gen = 0; gen < numGenerations; gen++) {
             scoreMap = new HashMap<String, Integer>();
             totalScore += nextGen();
-            if (printToTerminal) {
-                System.out.println("\nGeneration " + String.valueOf(gen + 1) + ":");
-                printGrid();
-            }
-        }
-
-        if (printToTerminal) {
-            System.out.println("Thanks for playing.\n");
         }
 
         return totalScore;
@@ -312,65 +236,6 @@ public class CellGrid {
                 cellMatrix[i][j]=cellMatrixNew[i][j];
     }
 
-    /*
-    Prints out the current grid of living and dead cells, with living cells
-    depicted as black boxes, and dead cells depicted as white spaces. The
-    grid is surrounded by small white squares - these are dead cells whose
-    statuses cannot change and act as the edge of the grid.
-     */
-    public void printGrid() {
-        System.out.println();
-
-        System.out.println(new String(new char[gridWidth]).replace("\0", "\u25AB "));
-        for (int row = 1; row < gridHeight -1; row++) {
-            String curRowString = "\u25AB ";
-            for (int col = 1; col < gridWidth -1; col++) {
-                if (cellMatrix[row][col]) {
-                    curRowString += "\u25A0 ";
-                } else {
-                    curRowString += "\u25A1 ";
-                }
-            }
-            System.out.println(curRowString + "\u25AB");
-        }
-        System.out.println(new String(new char[gridWidth]).replace("\0", "\u25AB "));
-    }
-
-    public void viewSimulation(boolean stepThru, int numGens, Configuration config) {
-        setStartingConfiguration(config);
-        final String ANSI_CLS = "\u001b[2J";
-        final String ANSI_HOME = "\u001b[H";
-
-        int totalScore = 0;
-
-        System.out.print(ANSI_CLS + ANSI_HOME);
-        System.out.flush();
-        System.out.println("Welcome to the Game of Life. Press the enter key to step through each frame.");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
-        System.out.print(ANSI_CLS + ANSI_HOME);
-        System.out.flush();
-
-        System.out.println("Here is your starting configuration:\n");
-        printGrid();
-
-        scanner = new Scanner(System.in);
-        scanner.nextLine();
-
-        for (int gen = 0; gen < numGens; gen++) {
-            System.out.print(ANSI_CLS + ANSI_HOME);
-            System.out.flush();
-            scoreMap = new HashMap<String, Integer>();
-            totalScore += nextGen();
-            System.out.println("\nGeneration " + String.valueOf(gen + 1) + ":");
-            printGrid();
-            scanner = new Scanner(System.in);
-            scanner.nextLine();
-
-        }
-        System.out.println("Your final score is: " + String.valueOf(totalScore));
-    }
-
     //Add all cases of cells status and their neighbors into liveDieTable
     private void initializeLiveDieTable(int curCellIndex, String neighborhood) {
         if (curCellIndex > 8) {
@@ -427,39 +292,6 @@ public class CellGrid {
             }
         }
         return false;
-    }
-
-    private void testLookupTable() {
-        String testNeighborhood1 = "000000000";
-        String testNeighborhood2 = "111111111";
-        String testNeighborhood3 = "111101111";
-        String testNeighborhood4 = "000010000";
-        String testNeighborhood5 = "111000000";
-        String testNeighborhood6 = "000111000";
-        String testNeighborhood7 = "000000111";
-        String testNeighborhood8 = "101000101";
-        String testNeighborhood9 = "010000010";
-        String testNeighborhood10 = "010010010";
-
-        System.out.println("These should all be living");
-        checkLookupTable(testNeighborhood5);
-        checkLookupTable(testNeighborhood6);
-        checkLookupTable(testNeighborhood7);
-        checkLookupTable(testNeighborhood10);
-
-        System.out.println("These should all be dead");
-        checkLookupTable(testNeighborhood1);
-        checkLookupTable(testNeighborhood2);
-        checkLookupTable(testNeighborhood3);
-        checkLookupTable(testNeighborhood4);
-        checkLookupTable(testNeighborhood8);
-        checkLookupTable(testNeighborhood9);
-    }
-
-    private void checkLookupTable(String neighborhood) {
-        if (isAliveNextGen(neighborhood)) {
-            System.out.println("Will Be Alive");
-        } else { System.out.println("will die");}
     }
 
     /**

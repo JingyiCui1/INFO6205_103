@@ -10,19 +10,35 @@ import java.util.Random;
 
 public class Configuration implements Comparable<Configuration>{
     private boolean[][] configMatrix;
-    private int matrixHeight = 16;
-    private int matrixWidth = 16;
+    private int matrixHeight = 20;
+    private int matrixWidth = 20;
     private double score = 0;
     private Random randGen = new Random();
-
-    public Configuration() {
-        configMatrix = new boolean[matrixHeight][matrixWidth];
-    }
 
     public Configuration(int matrixHeight, int matrixWidth) {
         this.matrixHeight = matrixHeight;
         this.matrixWidth = matrixWidth;
         configMatrix = new boolean[matrixHeight][matrixWidth];
+    }
+
+    public double getScore() {
+        return this.score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public int getMatrixHeight() {
+        return matrixHeight;
+    }
+
+    public int getMatrixWidth() {
+        return matrixWidth;
+    }
+
+    public boolean[][] getConfigMatrix() {
+        return configMatrix;
     }
 
     public int compareTo(Configuration otherConfig) {
@@ -91,14 +107,6 @@ public class Configuration implements Comparable<Configuration>{
         }
     }
 
-    public void setConfiguration(Configuration config) {
-        for (int row = 0; row < matrixHeight; row++) {
-            for (int col = 0; col < matrixWidth; col++) {
-                configMatrix[row][col] = config.getCell(row, col);
-            }
-        }
-    }
-
     public void setCell(int row, int col, boolean status) {
         configMatrix[row][col] = status;
     }
@@ -142,28 +150,4 @@ public class Configuration implements Comparable<Configuration>{
         return region;
     }
 
-
-    public void setRandomConfiguration()  {
-        setRandomConfiguration(30);
-    }
-
-    public double getScore() {
-        return this.score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    public int getMatrixHeight() {
-        return matrixHeight;
-    }
-
-    public int getMatrixWidth() {
-        return matrixWidth;
-    }
-
-    public boolean[][] getConfigMatrix() {
-        return configMatrix;
-    }
 }

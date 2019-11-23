@@ -1,6 +1,5 @@
 package ui;
 
-import model.CellGrid;
 import model.Configuration;
 import model.EvolutionaryAgent;
 
@@ -15,7 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class GameOfLifeFrame extends JFrame {
 
     private JButton startGameBtn = new JButton("Start Game");
-    private JTextField generationText = new JTextField();
+    private JButton generationBtn = new JButton();
+
 
     /**
      * flag to note whether game is started
@@ -27,7 +27,6 @@ public class GameOfLifeFrame extends JFrame {
      */
     private boolean stop = false;
 
-    private final int MAXIMUM_GENARATION = 1000;
 
 
     private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
@@ -43,23 +42,23 @@ public class GameOfLifeFrame extends JFrame {
 
 
     public GameOfLifeFrame() {
+
         setTitle("Game Of Life");
         startGameBtn.addActionListener(new StartGameActioner());
         buttonPanel.add(startGameBtn);
         buttonPanel.setBackground(Color.WHITE);
-        generationText.setHorizontalAlignment(JTextField.CENTER);
-        buttonPanel.add(generationText);
+        generationBtn.setHorizontalAlignment(JTextField.CENTER);
+        buttonPanel.add(generationBtn);
         getContentPane().add("North", buttonPanel);
 
 
-        myAgent = new EvolutionaryAgent(5);
+        myAgent = new EvolutionaryAgent();
         bestPattern = myAgent.evolvePattern();
-
 
         initGridLayout();
         showMatrix();
         gridPanel.updateUI();
-        generationText.setText("Total generation: 0");
+        generationBtn.setText("Total generation: 0");
         this.setSize(1000, 1200);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -111,11 +110,7 @@ public class GameOfLifeFrame extends JFrame {
                 new Thread(new GameControlTask()).start();
                 isStart = true;
                 stop = false;
-                startGameBtn.setText("Stop Game");
-            } else {
-                stop = true;
-                isStart = false;
-                startGameBtn.setText("Start Game");
+                startGameBtn.setEnabled(false);
             }
         }
     }
@@ -131,58 +126,51 @@ public class GameOfLifeFrame extends JFrame {
             while(!stop){
                 scoreMap = new HashMap<>();
                 boolean[][] oldMatrix = myAgent.myGrid.getCellMatrix();
-                boolean[][] temp=new boolean[18][18];
+                boolean[][] temp=new boolean[22][22];
                 for(int i=0;i<oldMatrix.length;i++) {
                     for (int j = 0; j < oldMatrix.length; j++) {
                           temp[i][j]=oldMatrix[i][j];
                     }
                 }
 
-
-              /* System.out.println("Matrix1");
-                for(int i=0;i<oldMatrix.length;i++){
-                    for(int j=0;j<oldMatrix.length;j++){
-                        if(oldMatrix[i][j]){
-                            System.out.print("1 ");
-                        }else{
-                            System.out.print("0 ");
-                        }
-
-                    }
-                    System.out.println();
-                }*/
                 totalScore += myAgent.myGrid.nextGen();
                 boolean[][] newMatrix= myAgent.myGrid.getCellMatrix();
-              /* System.out.println("Matrix2");
-                for(int i=0;i<newMatrix.length;i++){
-                    for(int j=0;j<newMatrix.length;j++){
-                        if(newMatrix[i][j]){
-                            System.out.print("1 ");
-                        }else{
-                            System.out.print("0 ");
-                        }
 
-                    }
-                    System.out.println();
-                }*/
-
-
-               int stopStatus = myAgent.myGrid.stopCheck(temp,newMatrix);
-               if(stopStatus==1){
+                int stopStatus = myAgent.myGrid.stopCheck(temp,newMatrix);
+                if(stopStatus==1){
                     stop=true;
-                    System.out.println("There is no cell any more. Game Over!");
+
+                    JOptionPane.showMessageDialog(
+                            gridPanel,
+                            "There is no cell any more.",
+                            "Game Over",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
                     break;
                 }else if(stopStatus==2){
                     stop=true;
-                    System.out.println("The generation number is larger than the maximum number. Game Over!");
+                    JOptionPane.showMessageDialog(
+                            gridPanel,
+                            "The generation number is larger than the maximum number. ",
+                            "Game Over",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                     break;
                 }else if(stopStatus==3){
                     stop=true;
-                    System.out.println("The status is the same as the previous one. Game Over!");
+                    JOptionPane.showMessageDialog(
+                            gridPanel,
+                            "The status is the same as the previous one. ",
+                            "Game Over",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+
                     break;
                 }
 
-                generationText.setText("Total generations: "+myAgent.myGrid.getGenCount());
+                generationBtn.setText("Total generations: " + myAgent.myGrid.getGenCount());
                 showMatrix2();
 
 
@@ -192,23 +180,6 @@ public class GameOfLifeFrame extends JFrame {
                     ex.printStackTrace();
                 }
             }
-
-
-           /* while (!stop) {
-                if((cellMatrix.getTotalGeneration()+1)==MAXIMUM_GENARATION){
-                    stop=true;
-                }
-                cellMatrix.transform();
-                generationText.setText("Total generations: "+cellMatrix.getTotalGeneration());
-                showMatrix();
-
-               try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-            }*/
-
         }
     }
 
