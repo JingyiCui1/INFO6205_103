@@ -83,8 +83,9 @@ public class CellGrid {
         return genCount;
     }
 
-
-
+    public void setGenCount(int genCount) {
+        this.genCount = genCount;
+    }
 
     /*
     Sets the initial configuration of living and dead cells on the cellMatrix.
@@ -311,13 +312,13 @@ public class CellGrid {
             return 3;
         }
 
-        return 0;
+        return -1;
     }
 
     private boolean equalCheck(boolean[][] matrix1,boolean[][] matrix2){
 
-        for(int row=1;row<gridHeight-1;row++){
-            for(int col=1;col<gridWidth-1;col++){
+        for(int row=1;row<matrix1.length-1;row++){
+            for(int col=1;col<matrix1[0].length-1;col++){
                 if(matrix1[row][col]!=matrix2[row][col]){
                     return false;
                 }

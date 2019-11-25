@@ -21,6 +21,12 @@ public class Configuration implements Comparable<Configuration>{
         configMatrix = new boolean[matrixHeight][matrixWidth];
     }
 
+    public Configuration(boolean[][] matrix){
+        this.matrixHeight = matrix.length;
+        this.matrixWidth = matrix[0].length;
+        configMatrix = matrix;
+    }
+
     public double getScore() {
         return this.score;
     }
