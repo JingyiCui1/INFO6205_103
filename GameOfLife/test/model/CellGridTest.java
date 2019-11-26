@@ -5,6 +5,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 /** 
 * CellGrid Tester. 
 * 
@@ -81,6 +85,8 @@ public class CellGridTest {
     */
     @Test
     public void testRunGame() throws Exception {
+           double score = cellGrid.runGame(10);
+           Assert.assertTrue(score==163605.0);
 
     }
 
@@ -91,7 +97,8 @@ public class CellGridTest {
     */
     @Test
     public void testNextGen() throws Exception {
-    //TODO: Test goes here...
+            double score = cellGrid.nextGen();
+            Assert.assertTrue(score==129527.0);
     }
 
     /**
@@ -101,7 +108,13 @@ public class CellGridTest {
     */
     @Test
     public void testEvalNeighborhoodType() throws Exception {
-    //TODO: Test goes here...
+          boolean eval = cellGrid.evalNeighborhoodType("101110000");
+          Assert.assertEquals(true,eval);
+          boolean eval2 = cellGrid.evalNeighborhoodType("111110000");
+          Assert.assertEquals(false,eval2);
+          boolean eval3 = cellGrid.evalNeighborhoodType("100110000");
+          Assert.assertEquals(true,eval3);
+
     }
 
     /**
@@ -150,184 +163,42 @@ public class CellGridTest {
     }
 
 
-/**
-*
-* Method: makeNeighborhood(int rowARelInd, String rowChunkA, String rowChunkB, String rowChunkC)
-*
-*/
-@Test
-public void testMakeNeighborhood() throws Exception {
-//TODO: Test goes here...
-/*
-try {
-   Method method = CellGrid.getClass().getMethod("makeNeighborhood", int.class, String.class, String.class, String.class);
-   method.setAccessible(true);
-   method.invoke(<Object>, <Parameters>);
-} catch(NoSuchMethodException e) {
-} catch(IllegalAccessException e) {
-} catch(InvocationTargetException e) {
-}
-*/
-}
+    /**
+    *
+    * Method: isAliveNextGen(String neighborhood)
+    *
+    */
+    @Test
+    public void testIsAliveNextGen() throws Exception {
+        boolean alive = cellGrid.isAliveNextGen("000010010");
+        Assert.assertEquals(false,alive);
 
-/**
-*
-* Method: isAliveNextGen(String neighborhood)
-*
-*/
-@Test
-public void testIsAliveNextGen() throws Exception {
-//TODO: Test goes here...
-/*
-try {
-   Method method = CellGrid.getClass().getMethod("isAliveNextGen", String.class);
-   method.setAccessible(true);
-   method.invoke(<Object>, <Parameters>);
-} catch(NoSuchMethodException e) {
-} catch(IllegalAccessException e) {
-} catch(InvocationTargetException e) {
-}
-*/
-}
+    }
 
-/**
-*
-* Method: scoreNeighborhood(String neighborhood, int curRow, int curCol)
-*
-*/
-@Test
-public void testScoreNeighborhood() throws Exception {
-//TODO: Test goes here...
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("scoreNeighborhood", String.class, int.class, int.class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
+    /**
+    *
+    * Method: scoreNeighborhood(String neighborhood, int curRow, int curCol)
+    *
+    */
+    @Test
+    public void testScoreNeighborhood() throws Exception {
+          double score1 = cellGrid.scoreNeighborhood("000000000",1,1);
+          Assert.assertTrue(score1==0);
+          double score2 = cellGrid.scoreNeighborhood("000010010",2,8);
+          Assert.assertTrue(score2==0);
+    }
 
-/** 
-* 
-* Method: copyChunk(int rowIndex, int leftColBound, int rightColBound) 
-* 
-*/ 
-@Test
-public void testCopyChunk() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("copyChunk", int.class, int.class, int.class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
+    /**
+    *
+    * Method: copyChunk(int rowIndex, int leftColBound, int rightColBound)
+    *
+    */
+    @Test
+    public void testCopyChunk() throws Exception {
+          String chunk = cellGrid.copyChunk(1,3,7);
+          Assert.assertEquals("1110",chunk);
+    }
 
-/** 
-* 
-* Method: updateCellMatrix(boolean[][] cellMatrixNew) 
-* 
-*/ 
-@Test
-public void testUpdateCellMatrix() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("updateCellMatrix", boolean[][].class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
 
-/** 
-* 
-* Method: initializeLiveDieTable(int curCellIndex, String neighborhood) 
-* 
-*/ 
-@Test
-public void testInitializeLiveDieTable() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("initializeLiveDieTable", int.class, String.class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
-
-/** 
-* 
-* Method: addNeighborhoodToTable(String neighborhood, boolean resultingStatus) 
-* 
-*/ 
-@Test
-public void testAddNeighborhoodToTable() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("addNeighborhoodToTable", String.class, boolean.class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
-
-/** 
-* 
-* Method: equalCheck(boolean[][] matrix1, boolean[][] matrix2) 
-* 
-*/ 
-@Test
-public void testEqualCheck() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("equalCheck", boolean[][].class, boolean[][].class); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
-
-/** 
-* 
-* Method: countLiveCell() 
-* 
-*/ 
-@Test
-public void testCountLiveCell() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = CellGrid.getClass().getMethod("countLiveCell"); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-} 
 
 } 

@@ -77,8 +77,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.CellGridTest" />
-        <item itemvalue="JUnit.ConfigurationTest" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.ConfigurationTest" />
       </list>
     </recent_temporary>
   </component>
@@ -102,8 +102,7 @@
       <workItem from="1574355030431" duration="60000" />
       <workItem from="1574355095445" duration="82000" />
       <workItem from="1574355199391" duration="20805000" />
-      <workItem from="1574645998676" duration="13389000" />
-      <workItem from="1574713172623" duration="23000" />
+      <workItem from="1574645998676" duration="20477000" />
     </task>
     <servers />
   </component>

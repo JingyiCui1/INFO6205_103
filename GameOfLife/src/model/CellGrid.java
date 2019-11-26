@@ -87,6 +87,10 @@ public class CellGrid {
         this.genCount = genCount;
     }
 
+    public HashMap<String, Boolean> getLiveDieTable() {
+        return liveDieTable;
+    }
+
     /*
     Sets the initial configuration of living and dead cells on the cellMatrix.
     Assumes that the input is of the proper dimensions.
@@ -138,7 +142,6 @@ public class CellGrid {
         String neighborhood;
         int rowARelInd;
         double score = 0;
-        int numLiveCells = 0;
 
         for (int curCol = 1; curCol < gridWidth -1; curCol++) {
             rowChunkA = copyChunk(0, curCol-1, curCol +2);
@@ -194,12 +197,12 @@ public class CellGrid {
         return neighborhood;
     }
 
-    private boolean isAliveNextGen(String neighborhood) {
+    public boolean isAliveNextGen(String neighborhood) {
         boolean status = liveDieTable.get(neighborhood);
         return status;
     }
 
-    private double scoreNeighborhood(String neighborhood, int curRow, int curCol) {
+    public double scoreNeighborhood(String neighborhood, int curRow, int curCol) {
         if (neighborhood.equals("000000000")) {
             return 0;
         }
@@ -219,7 +222,7 @@ public class CellGrid {
         }
     }
 
-    private String copyChunk(int rowIndex, int leftColBound, int rightColBound) {
+    public String copyChunk(int rowIndex, int leftColBound, int rightColBound) {
         String chunk = "";
         for (int i = leftColBound; i < rightColBound; i++) {
             if (cellMatrix[rowIndex][i]) {
@@ -241,15 +244,12 @@ public class CellGrid {
     private void initializeLiveDieTable(int curCellIndex, String neighborhood) {
         if (curCellIndex > 8) {
             addNeighborhoodToTable(neighborhood, evalNeighborhoodType(neighborhood));
-            //System.out.println("n="+neighborhood+", eval="+evalNeighborhoodType(neighborhood));
         }
         else {
             String neighborhood0 = neighborhood + "0";
             String neighborhood1 = neighborhood + "1";
             initializeLiveDieTable(curCellIndex + 1, neighborhood0);
-            //System.out.println("n0="+neighborhood0);
             initializeLiveDieTable(curCellIndex + 1, neighborhood1);
-            //System.out.println("n1="+neighborhood1);
         }
     }
 
@@ -330,8 +330,8 @@ public class CellGrid {
 
     private int countLiveCell(){
         int countLive = 0;
-        for(int row=1;row<gridHeight-1;row++){
-            for(int col=1;col<gridWidth-1;col++){
+        for(int row=0;row<gridHeight-1;row++){
+            for(int col=0;col<gridWidth-1;col++){
                 if(cellMatrix[row][col]){
                     countLive++;
                 }

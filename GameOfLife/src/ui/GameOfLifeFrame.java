@@ -133,6 +133,8 @@ public class GameOfLifeFrame extends JFrame {
                     }
                 }
 
+                generationBtn.setText("Total generations: " + myAgent.myGrid.getGenCount());
+                showMatrix2();
                 totalScore += myAgent.myGrid.nextGen();
                 boolean[][] newMatrix= myAgent.myGrid.getCellMatrix();
 
@@ -170,8 +172,7 @@ public class GameOfLifeFrame extends JFrame {
                     break;
                 }
 
-                generationBtn.setText("Total generations: " + myAgent.myGrid.getGenCount());
-                showMatrix2();
+
 
 
                try {

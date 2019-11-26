@@ -78,11 +78,6 @@ public class EvolutionaryAgent {
     }
 
 
-    private void resetVarianceOperators() {
-        mutationChance = 5;
-        crossoverChance = 5;
-    }
-
     public Configuration evolvePattern() {
         //Initialize individuals in the population with gridHeight and gridWidth
         generateStartingPopulation();
@@ -119,13 +114,6 @@ public class EvolutionaryAgent {
             //Implement mutation and crossover based on mutationChance and crossoverChance
             applyVariationOperators(numElites/2, mutationChance, crossoverChance);
 
-            // Reset mutation operators (if using triggered hypermutation)
-            if (hyperMutationTriggered) {
-                //Make both mutationChance and crossoverChance equal to 5
-                resetVarianceOperators();
-                hyperMutationTriggered = false;
-            }
-       // }
 
         for (Configuration config: population) {
             //Initialize cellMatrix
