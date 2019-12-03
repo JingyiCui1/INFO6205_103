@@ -2,6 +2,7 @@ package ui;
 
 import model.Configuration;
 import model.EvolutionaryAgent;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +38,8 @@ public class GameOfLifeFrame extends JFrame {
     private Configuration bestPattern;
     private EvolutionaryAgent myAgent;
 
-    private HashMap<String,Integer> scoreMap;
+    private HashMap<String,Integer> generationTable;
+    private static final Logger LOGGER = Logger.getLogger(GameOfLifeFrame.class);
 
 
 
@@ -54,6 +56,8 @@ public class GameOfLifeFrame extends JFrame {
 
         myAgent = new EvolutionaryAgent();
         bestPattern = myAgent.evolvePattern();
+        LOGGER.info("Best pattern of this population:");
+        myAgent.myGrid.printMatrix(bestPattern.getConfigMatrix());
 
         initGridLayout();
         showMatrix();
@@ -117,28 +121,27 @@ public class GameOfLifeFrame extends JFrame {
 
     private class GameControlTask implements Runnable {
 
+        int count = 0;
         @Override
         public void run() {
 
-            int totalScore = 0;
+
             myAgent.myGrid.setStartingConfiguration(bestPattern);
 
             while(!stop){
-                scoreMap = new HashMap<>();
                 boolean[][] oldMatrix = myAgent.myGrid.getCellMatrix();
-                boolean[][] temp=new boolean[22][22];
+                /*boolean[][] temp=new boolean[22][22];
                 for(int i=0;i<oldMatrix.length;i++) {
                     for (int j = 0; j < oldMatrix.length; j++) {
                           temp[i][j]=oldMatrix[i][j];
                     }
-                }
+                }*/
 
-                generationBtn.setText("Total generations: " + myAgent.myGrid.getGenCount());
+
                 showMatrix2();
-                totalScore += myAgent.myGrid.nextGen();
-                boolean[][] newMatrix= myAgent.myGrid.getCellMatrix();
-
-                int stopStatus = myAgent.myGrid.stopCheck(temp,newMatrix);
+                myAgent.myGrid.nextGen();
+                boolean[][] newMatrix= myAgent.myGrid.nextGen();
+                int stopStatus = myAgent.myGrid.stopCheck(oldMatrix,newMatrix);
                 if(stopStatus==1){
                     stop=true;
 
@@ -171,6 +174,14 @@ public class GameOfLifeFrame extends JFrame {
 
                     break;
                 }
+
+                myAgent.myGrid.updateCellMatrix(newMatrix);
+                count++;
+                myAgent.myGrid.setGenCount(count);
+                generationBtn.setText("Total generations: " + myAgent.myGrid.getGenCount());
+                LOGGER.info("Generation "+myAgent.myGrid.getGenCount());
+                myAgent.myGrid.printMatrix(newMatrix);
+
 
 
 

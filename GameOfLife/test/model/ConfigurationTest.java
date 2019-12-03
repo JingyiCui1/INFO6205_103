@@ -42,13 +42,15 @@ public class ConfigurationTest {
     @Before
     public void init(){
         boolean[][] m = new boolean[20][20];
+        int index = 0;
         for(int i=0;i<m.length;i++){
             for(int j=0;j<m[0].length;j++){
-                if(str.charAt(i*2+j)=='0'){
+                if(str.charAt(index)=='0'){
                     m[i][j]=false;
-                }else if(str.charAt(i*2+j)=='1'){
+                }else if(str.charAt(index)=='1'){
                     m[i][j]=true;
                 }
+                index++;
             }
         }
 
@@ -111,13 +113,15 @@ public class ConfigurationTest {
                         "10111100000000000000";
 
          boolean[][] temp = new boolean[20][20];
+         int index = 0;
          for(int i=0;i<temp.length;i++){
              for(int j=0;j<temp[0].length;j++){
-                 if(str2.charAt(i*2+j)==0){
+                 if(str2.charAt(index)==0){
                      temp[i][j]=false;
-                 }else if(str2.charAt(i*2+j)==1){
+                 }else if(str2.charAt(index)==1){
                      temp[i][j]=true;
                  }
+                 index++;
              }
          }
          Configuration copyFrom = new Configuration(temp);
