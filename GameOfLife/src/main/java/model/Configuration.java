@@ -6,14 +6,17 @@ Author: Ryan Gorey
 Last updated: 6/2/17
  */
 
+import org.apache.log4j.Logger;
+
 import java.util.Random;
 
 public class Configuration implements Comparable<Configuration>{
     private boolean[][] configMatrix;
     private int matrixHeight = 20;
     private int matrixWidth = 20;
-    private double score = 0;
+    private int maxGeneration = 0;
     private Random randGen = new Random();
+    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
 
     public Configuration(int matrixHeight, int matrixWidth) {
         this.matrixHeight = matrixHeight;
@@ -27,12 +30,12 @@ public class Configuration implements Comparable<Configuration>{
         configMatrix = matrix;
     }
 
-    public double getScore() {
-        return this.score;
+    public int getMaxGeneration() {
+        return maxGeneration;
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public void setMaxGeneration(int maxGeneration) {
+        this.maxGeneration = maxGeneration;
     }
 
     public int getMatrixHeight() {
@@ -48,10 +51,12 @@ public class Configuration implements Comparable<Configuration>{
     }
 
     public int compareTo(Configuration otherConfig) {
-        if (this.score > otherConfig.getScore()) {
+        if (this.maxGeneration > otherConfig.getMaxGeneration()) {
             return -1;
-        } else {
+        } else if(this.maxGeneration < otherConfig.getMaxGeneration()) {
             return 1;
+        }else{
+            return 0;
         }
     }
 
@@ -83,7 +88,7 @@ public class Configuration implements Comparable<Configuration>{
                 this.setCell(row, col, copyFrom.getCell(row, col));
             }
         }
-        this.setScore(copyFrom.getScore());
+        this.setMaxGeneration(copyFrom.getMaxGeneration());
     }
 
     /**
@@ -111,6 +116,7 @@ public class Configuration implements Comparable<Configuration>{
                 }
             }
         }
+
     }
 
     public void setCell(int row, int col, boolean status) {

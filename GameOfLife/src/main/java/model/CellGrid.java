@@ -28,6 +28,8 @@ package model;
  */
 
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 
 
@@ -37,9 +39,12 @@ public class CellGrid {
     private int gridWidth;
     private boolean[][] cellMatrix;
     private HashMap<String, Boolean> liveDieTable;
-    private HashMap<String, Integer> scoreMap;
     private int genCount = 0;
-    private final int MAX_GENERATION_COUNT = 10000;
+    private final int MAX_GENERATION_COUNT = 1000;
+    private HashMap<String, Integer> generationTable;
+    private static final Logger LOGGER = Logger.getLogger(CellGrid.class);
+    private CellGrid next;
+
 
 
     /*
@@ -57,10 +62,12 @@ public class CellGrid {
 
         cellMatrix = new boolean[this.gridHeight][this.gridWidth];
         liveDieTable = new HashMap<String, Boolean>();
-        scoreMap = new HashMap<String, Integer>();
+        generationTable = new HashMap<String, Integer>();
         String tempNeighborhood = "";
         initializeLiveDieTable(0, tempNeighborhood);
     }
+
+
 
     /*
         Returns a cellGrid object.
@@ -69,7 +76,7 @@ public class CellGrid {
     public CellGrid() {
         cellMatrix = new boolean[gridHeight][gridWidth];
         liveDieTable = new HashMap<String, Boolean>();
-        scoreMap = new HashMap<String, Integer>();
+        generationTable = new HashMap<String, Integer>();
         String tempNeighborhood = "";
         initializeLiveDieTable(0, tempNeighborhood);
     }
@@ -79,16 +86,16 @@ public class CellGrid {
         return cellMatrix;
     }
 
+    public void setCellMatrix(boolean[][] cellMatrix) {
+        this.cellMatrix = cellMatrix;
+    }
+
     public int getGenCount() {
         return genCount;
     }
 
     public void setGenCount(int genCount) {
         this.genCount = genCount;
-    }
-
-    public HashMap<String, Boolean> getLiveDieTable() {
-        return liveDieTable;
     }
 
     /*
@@ -112,15 +119,30 @@ public class CellGrid {
     }
 
 
-    public double runGame(int numGenerations) {
-        int totalScore = 0;
+    public int runGame(int numGenerations) {
+
+        boolean[][] old = this.cellMatrix;
+        /*boolean[][] oldMatrix = new boolean[temp.length][temp[0].length];
+        for(int i=0;i<temp.length;i++) {
+            for (int j = 0; j < temp[0].length; j++) {
+                oldMatrix[i][j]=temp[i][j];
+            }
+        }*/
+        //MatrixCopy m = new MatrixCopy(temp);
+
 
         for (int gen = 0; gen < numGenerations; gen++) {
-            scoreMap = new HashMap<String, Integer>();
-            totalScore += nextGen();
+            boolean[][] newMatrix = nextGen();
+            int stopStatus = this.stopCheck(old,newMatrix);
+            if(stopStatus == 1 || stopStatus == 2 || stopStatus == 3) {
+                break;
+            }
+            updateCellMatrix(newMatrix);
+            genCount++;
         }
 
-        return totalScore;
+        LOGGER.info("The max generation number for "+this+" is " + genCount );
+        return genCount;
     }
 
     /*
@@ -131,17 +153,16 @@ public class CellGrid {
 
     /**
      * Produce the next generation according to liveDieTable
-     * and return scores
+     * and return new cell matrix
      * @return
      */
-    public double nextGen() {
+    public boolean[][] nextGen() {
         boolean[][] cellMatrixNew = new boolean[this.gridHeight][this.gridWidth];
         String rowChunkA = "";
         String rowChunkB = "";
         String rowChunkC = "";
         String neighborhood;
         int rowARelInd;
-        double score = 0;
 
         for (int curCol = 1; curCol < gridWidth -1; curCol++) {
             rowChunkA = copyChunk(0, curCol-1, curCol +2);
@@ -164,19 +185,16 @@ public class CellGrid {
                 }
                 neighborhood = makeNeighborhood(rowARelInd, rowChunkA, rowChunkB, rowChunkC);
                 cellMatrixNew[curRow][curCol] = isAliveNextGen(neighborhood);
-                if (isAliveNextGen(neighborhood)) {
-                    score += 1;
-                }
-                score += scoreNeighborhood(neighborhood, curRow, curCol);
                 if (rowARelInd == 0) {
                     rowARelInd = 2;
                 } else { rowARelInd--; }
 
             }
         }
-        updateCellMatrix(cellMatrixNew);
-        genCount++;
-        return score;
+        //updateCellMatrix(cellMatrixNew);
+        //next.setCellMatrix(cellMatrixNew);
+        //genCount++;
+        return cellMatrixNew;
     }
 
     private String makeNeighborhood(int rowARelInd, String rowChunkA, String rowChunkB, String rowChunkC) {
@@ -202,26 +220,6 @@ public class CellGrid {
         return status;
     }
 
-    public double scoreNeighborhood(String neighborhood, int curRow, int curCol) {
-        if (neighborhood.equals("000000000")) {
-            return 0;
-        }
-        String neighborhoodAndLocation = neighborhood + "r" + String.valueOf(curRow) + "c" + String.valueOf(curCol);
-
-        if (scoreMap.containsKey(neighborhood)) {
-            if (scoreMap.containsKey(neighborhoodAndLocation)) {
-                return 250;
-            } else {
-                scoreMap.put(neighborhoodAndLocation, 1);
-                return 500;
-            }
-        } else {
-            scoreMap.put(neighborhood, 1);
-            scoreMap.put(neighborhoodAndLocation, 1);
-            return 0;
-        }
-    }
-
     public String copyChunk(int rowIndex, int leftColBound, int rightColBound) {
         String chunk = "";
         for (int i = leftColBound; i < rightColBound; i++) {
@@ -234,10 +232,12 @@ public class CellGrid {
         return chunk;
     }
 
-    private void updateCellMatrix(boolean[][] cellMatrixNew) {
+    public void updateCellMatrix(boolean[][] cellMatrixNew) {
         for(int i=0; i < gridHeight; i++)
             for(int j=0; j < gridWidth; j++)
                 cellMatrix[i][j]=cellMatrixNew[i][j];
+
+
     }
 
     //Add all cases of cells status and their neighbors into liveDieTable
@@ -304,7 +304,7 @@ public class CellGrid {
 
     public int stopCheck(boolean[][] oldMatrix,boolean[][] newMatrix){
 
-        if(getGenCount()>MAX_GENERATION_COUNT) return 2;
+        if(this.genCount>MAX_GENERATION_COUNT) return 2;
 
         if(countLiveCell()==0) return 1;
 
@@ -315,7 +315,7 @@ public class CellGrid {
         return -1;
     }
 
-    private boolean equalCheck(boolean[][] matrix1,boolean[][] matrix2){
+    public boolean equalCheck(boolean[][] matrix1,boolean[][] matrix2){
 
         for(int row=1;row<matrix1.length-1;row++){
             for(int col=1;col<matrix1[0].length-1;col++){
@@ -338,6 +338,40 @@ public class CellGrid {
             }
         }
         return countLive;
+    }
+
+    public void printMatrix(boolean[][] matrix){
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        if(matrix.length==20){
+            for(int i=0;i<matrix.length;i++){
+                for(int j=0;j<matrix[0].length;j++){
+                    if(matrix[i][j]){
+                        sb.append(1);
+                    }else{
+                        sb.append(0);
+                    }
+
+                }
+                sb.append("\n");
+            }
+        }else{
+
+            for(int i=1;i<matrix.length-1;i++){
+                for(int j=1;j<matrix[0].length-1;j++){
+                    if(matrix[i][j]){
+                        sb.append(1);
+                    }else{
+                        sb.append(0);
+                    }
+
+                }
+                sb.append("\n");
+            }
+        }
+
+        LOGGER.info(sb.toString());
     }
 
 }

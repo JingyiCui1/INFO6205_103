@@ -47,13 +47,15 @@ public class CellGridTest {
     @Before
     public void before() throws Exception {
         m = new boolean[20][20];
+        int index = 0;
         for(int i=0;i<m.length;i++){
             for(int j=0;j<m[0].length;j++){
-                if(str.charAt(i*2+j)=='0'){
+                if(str.charAt(index)=='0'){
                     m[i][j]=false;
-                }else if(str.charAt(i*2+j)=='1'){
+                }else if(str.charAt(index)=='1'){
                     m[i][j]=true;
                 }
+                index++;
             }
         }
 
@@ -85,8 +87,8 @@ public class CellGridTest {
     */
     @Test
     public void testRunGame() throws Exception {
-           double score = cellGrid.runGame(10);
-           Assert.assertTrue(score==163605.0);
+           int generation = cellGrid.runGame(10);
+           Assert.assertEquals(10,generation);
 
     }
 
@@ -97,8 +99,46 @@ public class CellGridTest {
     */
     @Test
     public void testNextGen() throws Exception {
-            double score = cellGrid.nextGen();
-            Assert.assertTrue(score==129527.0);
+            boolean[][] matrix= cellGrid.nextGen();
+            String s =
+                    "00010000000000000000" +
+                    "01110000000000000110" +
+                    "00000000000000000000" +
+                    "00000000000000000110" +
+                    "01100001000100000000" +
+                    "10100001000100000000" +
+                    "10110000000000000000" +
+                    "10000000001000110000" +
+                    "11111010001000100000" +
+                    "10101000000000010000" +
+                    "00000011000100000000" +
+                    "00000110100000000000" +
+                    "10100001010000000000" +
+                    "01000000101000000010" +
+                    "00000000000010000000" +
+                    "11000000101010101000" +
+                    "11001000001000000000" +
+                    "01010000000000000000" +
+                    "01100000000000000000" +
+                    "00101100000000000000";
+
+
+
+            int index = 0;
+            boolean temp= false;
+            for(int i=1;i<matrix.length-1;i++){
+               for(int j=1;j<matrix[0].length-1;j++){
+                if(s.charAt(index)=='0'){
+                    temp=false;
+                    Assert.assertEquals(temp,matrix[i][j]);
+                }else if(s.charAt(index)=='1'){
+                    temp=true;
+                    Assert.assertEquals(temp,matrix[i][j]);
+                }
+                index++;
+            }
+        }
+
     }
 
     /**
@@ -175,18 +215,6 @@ public class CellGridTest {
 
     }
 
-    /**
-    *
-    * Method: scoreNeighborhood(String neighborhood, int curRow, int curCol)
-    *
-    */
-    @Test
-    public void testScoreNeighborhood() throws Exception {
-          double score1 = cellGrid.scoreNeighborhood("000000000",1,1);
-          Assert.assertTrue(score1==0);
-          double score2 = cellGrid.scoreNeighborhood("000010010",2,8);
-          Assert.assertTrue(score2==0);
-    }
 
     /**
     *

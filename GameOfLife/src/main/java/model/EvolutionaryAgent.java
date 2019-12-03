@@ -1,5 +1,7 @@
 package model;
 
+import org.apache.log4j.Logger;
+
 import java.util.*;
 
 /**
@@ -17,13 +19,14 @@ public class EvolutionaryAgent {
 
     private int popSize = 1000;
     private int numGens = 100;
-    private int numGameGens = 50;
     private int numElites = 20;
     private int tournamentSize = 40;
 
-    private int liveChance = 50;
+    private int liveChance = 20;
     private int mutationChance = 5;
     private int crossoverChance = 5;
+    private final int MAX_GENERATION = 1000;
+    private static final Logger LOGGER = Logger.getLogger(EvolutionaryAgent.class);
 
 
     public EvolutionaryAgent() {
@@ -32,7 +35,7 @@ public class EvolutionaryAgent {
     }
 
     /**
-     * Initialize myGrid(cellMatrix, liveDieTable, scoreMap),
+     * Initialize myGrid(cellMatrix, liveDieTable, generationTable),
      * population(certain num of population(each contains configMatrix))
      * @param numGens
      */
@@ -69,6 +72,7 @@ public class EvolutionaryAgent {
         for (int i = 0; i < popSize; i++) {
             population[i].setRandomConfiguration(liveChance);
         }
+        LOGGER.info("Set random initial pattern for population successfully.");
     }
 
     private void initializeNewPopulation(Configuration[] newPopulation) {
@@ -80,7 +84,7 @@ public class EvolutionaryAgent {
 
     public Configuration evolvePattern() {
         //Initialize individuals in the population with gridHeight and gridWidth
-        generateStartingPopulation();
+        //generateStartingPopulation();
         //Set initial status randomly of cells in each individual
         initializePopulation(liveChance);
         boolean hyperMutationTriggered = false;
@@ -90,45 +94,44 @@ public class EvolutionaryAgent {
             for (Configuration config: population) {
                 //Initialize cellMatrix in CellGrid using Configuration
                 myGrid.setStartingConfiguration(config);
-                //Get total score for each individual after numGameGens generations
-                config.setScore(myGrid.runGame(numGameGens));
+                //Get max generation for each individual after numGameGens generations
+                config.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
             }
-            //Sort individuals by total score descendently
+            //Sort individuals by max generation descendently
             sortPopulation();
-
 
             // Selection (w/ elitism)
             //Create a new population
-            Configuration[] newPopulation = new Configuration[popSize];
+            //Configuration[] newPopulation = new Configuration[popSize];
             //Initialize new population with gridHeight and gridWidth
-            initializeNewPopulation(newPopulation);
+            //initializeNewPopulation(newPopulation);
             //Clone first numElites individuals from population to new population
-            cloneElites(newPopulation);
-            //Shuffle remaining individuals in the new population and find the highest score, then
+            //cloneElites(newPopulation);
+            //Shuffle remaining individuals in the new population and find the max generation, then
             //make remaining equal to it
-            selectRemainingIndividuals(numElites, newPopulation);
+            //selectRemainingIndividuals(numElites, newPopulation);
             //Save the new population into population
-            saveNewPopulation(newPopulation);
+            //saveNewPopulation(newPopulation);
 
             // Apply chance for mutation
             //Implement mutation and crossover based on mutationChance and crossoverChance
-            applyVariationOperators(numElites/2, mutationChance, crossoverChance);
+            //applyVariationOperators(numElites/2, mutationChance, crossoverChance);
 
 
-        for (Configuration config: population) {
+        /*for (Configuration config: population) {
             //Initialize cellMatrix
             myGrid.setStartingConfiguration(config);
-            //Get total score for each individual after numGameGens generations
-            config.setScore(myGrid.runGame(numGameGens));
-        }
+            //Get max generation for each individual after numGameGens generations
+            config.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
+        }*/
 
         //Find the best individual
-        Configuration bestConfig = findBestConfiguration();
+        Configuration bestConfig = population[0];//findBestConfiguration();
         return bestConfig;
     }
 
     /**
-     * Clone certain number of individuals according to total score
+     * Clone certain number of individuals according to max generation
      * @param newPopulation
      */
     private void cloneElites(Configuration[] newPopulation) {
@@ -139,7 +142,7 @@ public class EvolutionaryAgent {
     }
 
     /**
-     * Find the highest score and make remaining individuals equal it
+     * Find the highest generation num and make remaining individuals equal it
      * @param startingIndex
      * @param newPopulation
      */
@@ -148,7 +151,7 @@ public class EvolutionaryAgent {
             shufflePopulation(startingIndex);
             Configuration bestConfig = population[0];
             for (int j = 0; j < tournamentSize; j++) {
-                if (bestConfig.getScore() < population[j].getScore()) {
+                if (bestConfig.getMaxGeneration() < population[j].getMaxGeneration()) {
                     bestConfig.deepCopy(population[j]);
                 }
             }
@@ -163,14 +166,14 @@ public class EvolutionaryAgent {
     }
 
     /**
-     * Sort Configurations in a population according to total score (descending)
+     * Sort Configurations in a population according to max generation (descending)
      */
     public void sortPopulation() {
-
         Arrays.asList(population);
         List<Configuration> popList = new ArrayList<Configuration>(Arrays.asList(population));
         Collections.sort(popList);
         population = popList.toArray(population);
+        LOGGER.info("Sort population successfully");
 
     }
 
@@ -178,7 +181,7 @@ public class EvolutionaryAgent {
     private Configuration findBestConfiguration() {
         Configuration bestConfig = population[0];
         for (Configuration config : population) {
-            if (bestConfig.getScore() < config.getScore()) {
+            if (bestConfig.getMaxGeneration() < config.getMaxGeneration()) {
                 bestConfig = config;
             }
         }
