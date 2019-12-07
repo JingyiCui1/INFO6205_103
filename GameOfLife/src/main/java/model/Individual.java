@@ -1,33 +1,26 @@
-package model;/*
-Configuration class stores a starting configuration of living and dead cells
-in a user-defined matrix. Used for evolutionary algorithm evolving starting
-configurations for Conway's Game of Life.
-Author: Ryan Gorey
-Last updated: 6/2/17
- */
-
+package model;
 import org.apache.log4j.Logger;
 
 import java.util.Random;
 
-public class Configuration implements Comparable<Configuration>{
-    private boolean[][] configMatrix;
+public class Individual implements Comparable<Individual>{
+    private boolean[][] individualMatrix;
     private int matrixHeight = 20;
     private int matrixWidth = 20;
     private int maxGeneration = 0;
     private Random randGen = new Random();
-    private static final Logger LOGGER = Logger.getLogger(Configuration.class);
+    private static final Logger LOGGER = Logger.getLogger(Individual.class);
 
-    public Configuration(int matrixHeight, int matrixWidth) {
+    public Individual(int matrixHeight, int matrixWidth) {
         this.matrixHeight = matrixHeight;
         this.matrixWidth = matrixWidth;
-        configMatrix = new boolean[matrixHeight][matrixWidth];
+        individualMatrix = new boolean[matrixHeight][matrixWidth];
     }
 
-    public Configuration(boolean[][] matrix){
+    public Individual(boolean[][] matrix){
         this.matrixHeight = matrix.length;
         this.matrixWidth = matrix[0].length;
-        configMatrix = matrix;
+        individualMatrix = matrix;
     }
 
     public int getMaxGeneration() {
@@ -46,14 +39,14 @@ public class Configuration implements Comparable<Configuration>{
         return matrixWidth;
     }
 
-    public boolean[][] getConfigMatrix() {
-        return configMatrix;
+    public boolean[][] getIndividualMatrix() {
+        return individualMatrix;
     }
 
-    public int compareTo(Configuration otherConfig) {
-        if (this.maxGeneration > otherConfig.getMaxGeneration()) {
+    public int compareTo(Individual otherIndividual) {
+        if (this.maxGeneration > otherIndividual.getMaxGeneration()) {
             return -1;
-        } else if(this.maxGeneration < otherConfig.getMaxGeneration()) {
+        } else if(this.maxGeneration < otherIndividual.getMaxGeneration()) {
             return 1;
         }else{
             return 0;
@@ -76,13 +69,13 @@ public class Configuration implements Comparable<Configuration>{
                 randInt = randGen.nextInt(100);
                 if (randInt < mutationChance) {
                     status = randGen.nextBoolean();
-                    configMatrix[row][col] = status;
+                    individualMatrix[row][col] = status;
                 }
             }
         }
     }
 
-    public void deepCopy(Configuration copyFrom) {
+    public void deepCopy(Individual copyFrom) {
         for (int row = 0; row < matrixHeight; row++) {
             for (int col = 0; col < matrixWidth; col++) {
                 this.setCell(row, col, copyFrom.getCell(row, col));
@@ -98,7 +91,7 @@ public class Configuration implements Comparable<Configuration>{
      * Otherwise, this cell is dead
      * @param cellChanceToLive
      */
-    public void setRandomConfiguration(int cellChanceToLive)  {
+    public void setRandomIndividual(int cellChanceToLive)  {
         if (cellChanceToLive > 100) {
             cellChanceToLive = 100;
 
@@ -112,19 +105,22 @@ public class Configuration implements Comparable<Configuration>{
             for (int col = 0; col < matrixWidth; col++) {
                 int randInt = randGen.nextInt(100);
                 if (randInt < cellChanceToLive) {
-                    configMatrix[row][col] = true;
+                    individualMatrix[row][col] = true;
                 }
             }
         }
 
+        LOGGER.info("The random initial matrix for "+this+":");
+        new CellGrid().printMatrix(individualMatrix);
+
     }
 
     public void setCell(int row, int col, boolean status) {
-        configMatrix[row][col] = status;
+        individualMatrix[row][col] = status;
     }
 
     public boolean getCell(int row, int col) {
-        return configMatrix[row][col];
+        return individualMatrix[row][col];
     }
 
     /**
@@ -138,7 +134,7 @@ public class Configuration implements Comparable<Configuration>{
     public void setCellRegion(int topRowInd, int leftColInd, int height, int width, boolean[][] region) {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                configMatrix[topRowInd + row][leftColInd + col] = region[row][col];
+                individualMatrix[topRowInd + row][leftColInd + col] = region[row][col];
             }
 
         }
@@ -156,7 +152,7 @@ public class Configuration implements Comparable<Configuration>{
         boolean[][] region = new boolean[height][width];
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                region[row][col] = configMatrix[topRowInd + row][leftColInd + col];
+                region[row][col] = individualMatrix[topRowInd + row][leftColInd + col];
             }
         }
         return region;

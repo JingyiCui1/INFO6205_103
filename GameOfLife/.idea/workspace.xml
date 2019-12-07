@@ -11,6 +11,13 @@
   <component name="FavoritesManager">
     <favorites_list name="GameOfLife" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="ProjectId" id="1TnVUXIyVGB4NucgrN9XhDWqIeX" />
   <component name="PropertiesComponent">
     <property name="Downloaded.Files.Path.Enabled" value="false" />
@@ -21,18 +28,23 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/model" />
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="model" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/model" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test/model" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
@@ -48,7 +60,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.CellGridTest">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="GameOfLife" />
@@ -74,10 +86,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="IndividualTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="IndividualTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.CellGridTest" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.CellGridTest" />
+        <item itemvalue="JUnit.IndividualTest" />
         <item itemvalue="JUnit.ConfigurationTest" />
       </list>
     </recent_temporary>
@@ -103,6 +125,10 @@
       <workItem from="1574355095445" duration="82000" />
       <workItem from="1574355199391" duration="20805000" />
       <workItem from="1574645998676" duration="20477000" />
+      <workItem from="1574787926849" duration="29107000" />
+      <workItem from="1575341709830" duration="11346000" />
+      <workItem from="1575639557736" duration="16658000" />
+      <workItem from="1575724965362" duration="9993000" />
     </task>
     <servers />
   </component>

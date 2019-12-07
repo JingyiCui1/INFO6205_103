@@ -1,39 +1,11 @@
 package model;
-/**
- * cellGrid class Implementation
- *
- *
- * This class implements a cellGrid object, which simulates Conway's Game of
- * Life. It includes a very basic graphical interface which can print the
- * current state of the board to the terminal. It is included to aid with
- * debugging, and may not be useful for displaying full runs.
- *
- *
- * TO - DO:
- *
- * This project currently uses a lookup table for three by three neighborhoods of cells.
- * This is currently implemented to use a mutable object boolean[][] as the key. I have
- * since learned that the keys must not be mutable objects. Therefore, I should rewrite
- * code to make the keys immutable objects. I will change the row implementation to instead
- * code 0s and 1s instead of copying arrays directly. The neighborhood will be represented
- * as a string of 0s and 1s instead of a boolean[][] which should let me properly use
- * neighborhoods as keys.
- *
- * Test: if the lookup table works properly - try lots of values of neighborhoods.
- * Test: if next gen works properly.
- * Test: if makeNeighborhood properly adjusts.
- * Test: simple oscillating pattern.
- *
- *
- */
-
 
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 
 
-public class CellGrid {
+public class CellGrid{
 
     private int gridHeight;
     private int gridWidth;
@@ -41,20 +13,9 @@ public class CellGrid {
     private HashMap<String, Boolean> liveDieTable;
     private int genCount = 0;
     private final int MAX_GENERATION_COUNT = 1000;
-    private HashMap<String, Integer> generationTable;
     private static final Logger LOGGER = Logger.getLogger(CellGrid.class);
-    private CellGrid next;
 
 
-
-    /*
-   Returns a cellGrid object. Note that the user dimensions are increased by
-   two - this is specific to the implementation and should not affect the
-   user's experience.
-   @param gridHeight    the int number of rows in the grid.
-   @param gridWidth     the int number of columns in the grid.
-   @return the cellGrid object
-    */
     public CellGrid(int gridHeight, int gridWidth) {
         this.gridHeight = gridHeight + 2;
         this.gridWidth = gridWidth + 2;
@@ -62,21 +23,23 @@ public class CellGrid {
 
         cellMatrix = new boolean[this.gridHeight][this.gridWidth];
         liveDieTable = new HashMap<String, Boolean>();
-        generationTable = new HashMap<String, Integer>();
         String tempNeighborhood = "";
         initializeLiveDieTable(0, tempNeighborhood);
     }
 
 
-
-    /*
-        Returns a cellGrid object.
-        @return the cellGrid object
-         */
     public CellGrid() {
-        cellMatrix = new boolean[gridHeight][gridWidth];
+        cellMatrix = new boolean[22][22];
         liveDieTable = new HashMap<String, Boolean>();
-        generationTable = new HashMap<String, Integer>();
+        String tempNeighborhood = "";
+        initializeLiveDieTable(0, tempNeighborhood);
+    }
+
+    public CellGrid(boolean[][] matrix) {
+        this.gridHeight = matrix.length;
+        this.gridWidth = matrix.length;
+        cellMatrix = matrix;
+        liveDieTable = new HashMap<String, Boolean>();
         String tempNeighborhood = "";
         initializeLiveDieTable(0, tempNeighborhood);
     }
@@ -84,10 +47,6 @@ public class CellGrid {
 
     public boolean[][] getCellMatrix() {
         return cellMatrix;
-    }
-
-    public void setCellMatrix(boolean[][] cellMatrix) {
-        this.cellMatrix = cellMatrix;
     }
 
     public int getGenCount() {
@@ -98,22 +57,16 @@ public class CellGrid {
         this.genCount = genCount;
     }
 
-    /*
-    Sets the initial configuration of living and dead cells on the cellMatrix.
-    Assumes that the input is of the proper dimensions.
-    @param initialConfig    2-D array that holds boolean values, with true
-                            denoting living cells, false denoting dead cells.
-     */
 
     /**
-     * Set the initial status of cellMatrix given configMatrix
-     * @param initialConfig
+     * Set the initial status of cellMatrix given individualMatrix
+     * @param initialIndividual
      */
-    public void setStartingConfiguration(Configuration initialConfig) {
+    public void setStartingIndividual(Individual initialIndividual) {
         genCount=0;
         for (int row = 1; row < gridHeight - 1; row++) {
             for (int col = 1; col < gridWidth - 1; col++) {
-                cellMatrix[row][col] = initialConfig.getCell(row-1, col-1);
+                cellMatrix[row][col] = initialIndividual.getCell(row-1, col-1);
             }
         }
     }
@@ -122,34 +75,20 @@ public class CellGrid {
     public int runGame(int numGenerations) {
 
         boolean[][] old = this.cellMatrix;
-        /*boolean[][] oldMatrix = new boolean[temp.length][temp[0].length];
-        for(int i=0;i<temp.length;i++) {
-            for (int j = 0; j < temp[0].length; j++) {
-                oldMatrix[i][j]=temp[i][j];
-            }
-        }*/
-        //MatrixCopy m = new MatrixCopy(temp);
 
 
         for (int gen = 0; gen < numGenerations; gen++) {
             boolean[][] newMatrix = nextGen();
             int stopStatus = this.stopCheck(old,newMatrix);
-            if(stopStatus == 1 || stopStatus == 2 || stopStatus == 3) {
+            if(stopStatus == 1 || stopStatus == 2 || stopStatus == 3 || stopStatus == 4) {
                 break;
             }
             updateCellMatrix(newMatrix);
             genCount++;
         }
-
-        LOGGER.info("The max generation number for "+this+" is " + genCount );
         return genCount;
     }
 
-    /*
-    Updates which cells are alive and which cells are dead in the next
-    generation. The cells on the outer edge do not count as live cells and
-    may not come to life. Returns the score for each generation.
-     */
 
     /**
      * Produce the next generation according to liveDieTable
@@ -191,9 +130,6 @@ public class CellGrid {
 
             }
         }
-        //updateCellMatrix(cellMatrixNew);
-        //next.setCellMatrix(cellMatrixNew);
-        //genCount++;
         return cellMatrixNew;
     }
 
@@ -312,6 +248,10 @@ public class CellGrid {
             return 3;
         }
 
+        if(cycleCheck()){
+            return 4;
+        }
+
         return -1;
     }
 
@@ -327,6 +267,20 @@ public class CellGrid {
 
         return true;
     }
+
+    public boolean cycleCheck(){
+
+        boolean[][] newMatrix = this.nextGen();
+        CellGrid c = new CellGrid(newMatrix);
+        boolean[][] cMatrix = c.nextGen();
+        boolean b1 = equalCheck(cellMatrix,cMatrix);
+        if(b1) return true;
+
+        return false;
+    }
+
+
+
 
     private int countLiveCell(){
         int countLive = 0;

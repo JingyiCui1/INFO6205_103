@@ -1,13 +1,8 @@
-import javafx.scene.control.Cell;
 import model.CellGrid;
-import model.Configuration;
+import model.Individual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 /** 
 * CellGrid Tester. 
@@ -18,7 +13,7 @@ import java.util.Set;
 */ 
 public class CellGridTest {
 
-    Configuration config1;
+    Individual individual1;
     CellGrid cellGrid;
 
     String str  = "10111000001100000100" +
@@ -59,23 +54,23 @@ public class CellGridTest {
             }
         }
 
-        config1 = new Configuration(m);
+        individual1 = new Individual(m);
         cellGrid = new CellGrid(20,20);
-        cellGrid.setStartingConfiguration(config1);
+        cellGrid.setStartingIndividual(individual1);
     }
 
 
 
     /**
     *
-    * Method: setStartingConfiguration(Configuration initialConfig)
+    * Method: setStartingIndividual(Individual initialIndividual)
     *
     */
     @Test
-    public void testSetStartingConfiguration() throws Exception {
+    public void testSetStartingIndividual() throws Exception {
         for(int i=0;i<20;i++){
             for(int j=0;j<20;j++){
-                Assert.assertTrue(config1.getConfigMatrix()[i][j]==cellGrid.getCellMatrix()[i+1][j+1]);
+                Assert.assertTrue(individual1.getIndividualMatrix()[i][j]==cellGrid.getCellMatrix()[i+1][j+1]);
             }
         }
     }
@@ -164,7 +159,7 @@ public class CellGridTest {
     */
     @Test
     public void testStopCheck() throws Exception {
-        Configuration same = new Configuration(m);
+        Individual same = new Individual(m);
 
         boolean[][] temp = new boolean[22][22];
         for(int i=0;i<temp.length;i++){
@@ -176,7 +171,7 @@ public class CellGridTest {
         boolean[][] temp2 = new boolean[22][22];
         for(int i=0;i<20;i++){
             for(int j=0;j<20;j++){
-                temp2[i+1][j+1] = same.getConfigMatrix()[i][j];
+                temp2[i+1][j+1] = same.getIndividualMatrix()[i][j];
             }
         }
 
@@ -185,17 +180,17 @@ public class CellGridTest {
 
 
 
-        Configuration c = new Configuration(20,20);
+        Individual c = new Individual(20,20);
         CellGrid test = new CellGrid(20,20);
-        test.setStartingConfiguration(c);
+        test.setStartingIndividual(c);
         boolean[][] dead = test.getCellMatrix();
         int result1 = test.stopCheck(temp,dead);
         Assert.assertEquals(1,result1);
 
 
-        Configuration c2 = new Configuration(m);
+        Individual c2 = new Individual(m);
         CellGrid test2 = new CellGrid(20,20);
-        test2.setStartingConfiguration(c);
+        test2.setStartingIndividual(c);
         test2.setGenCount(10001);
         int result2 = test2.stopCheck(temp2,temp);
         Assert.assertEquals(2,result2);

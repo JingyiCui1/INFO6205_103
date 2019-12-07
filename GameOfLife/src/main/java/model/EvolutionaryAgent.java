@@ -9,132 +9,110 @@ import java.util.*;
  * Life to evolve interesting patterns. This class manages the population,
  * selection, and mutation.
  */
-public class EvolutionaryAgent {
-    public CellGrid myGrid;
-    private Configuration[] population;
+public class EvolutionaryAgent{
+    public  CellGrid myGrid;
+    private Individual[] population;
     private Random randGen = new Random();
 
     private int gridHeight = 20;
     private int gridWidth = 20;
 
     private int popSize = 1000;
-    private int numGens = 100;
+    private int numGens = 20; // it should be the length of population, but it will take a long time to run the project
     private int numElites = 20;
     private int tournamentSize = 40;
 
-    private int liveChance = 20;
+    private int liveChance = 40;
     private int mutationChance = 5;
     private int crossoverChance = 5;
-    private final int MAX_GENERATION = 1000;
+    private final int MAX_GENERATION = 1000;//it should be 10000, but it will take a long time to run the project
     private static final Logger LOGGER = Logger.getLogger(EvolutionaryAgent.class);
-
 
     public EvolutionaryAgent() {
         myGrid = new CellGrid(gridHeight, gridWidth);
         generateStartingPopulation();
     }
 
-    /**
-     * Initialize myGrid(cellMatrix, liveDieTable, generationTable),
-     * population(certain num of population(each contains configMatrix))
-     * @param numGens
-     */
-    public EvolutionaryAgent(int numGens) {
-        this.numGens = numGens;
-        myGrid = new CellGrid(gridHeight, gridWidth);
-        generateStartingPopulation();
-    }
-
-    public EvolutionaryAgent(int gridHeight, int gridWidth) {
-        this.gridHeight = gridHeight;
-        this.gridWidth = gridWidth;
-        myGrid = new CellGrid(gridHeight, gridWidth);
-        generateStartingPopulation();
-    }
-
-    public EvolutionaryAgent(int gridHeight, int gridWidth, int popSize) {
-        this.gridHeight = gridHeight;
-        this.gridWidth = gridWidth;
-        this.popSize = popSize;
-        myGrid = new CellGrid(gridHeight, gridWidth);
-        generateStartingPopulation();
-    }
 
     private void generateStartingPopulation() {
 
-        population = new Configuration[popSize];
+        population = new Individual[popSize];
         for (int i = 0; i < popSize; i++) {
-            population[i] = new Configuration(gridHeight, gridWidth);
+            population[i] = new Individual(gridHeight, gridWidth);
         }
     }
 
     private void initializePopulation(int liveChance) {
         for (int i = 0; i < popSize; i++) {
-            population[i].setRandomConfiguration(liveChance);
+            population[i].setRandomIndividual(liveChance);
         }
         LOGGER.info("Set random initial pattern for population successfully.");
     }
 
-    private void initializeNewPopulation(Configuration[] newPopulation) {
+    private void initializeNewPopulation(Individual[] newPopulation) {
         for (int i = 0; i < popSize; i++) {
-            newPopulation[i] = new Configuration(gridHeight, gridWidth);
+            newPopulation[i] = new Individual(gridHeight, gridWidth);
         }
     }
 
 
-    public Configuration evolvePattern() {
+    public Individual evolvePattern() {
         //Initialize individuals in the population with gridHeight and gridWidth
-        //generateStartingPopulation();
+        generateStartingPopulation();
         //Set initial status randomly of cells in each individual
         initializePopulation(liveChance);
-        boolean hyperMutationTriggered = false;
 
-       // for (int gen = 0; gen < numGens; gen++) {
-            // Evaluation
-            for (Configuration config: population) {
-                //Initialize cellMatrix in CellGrid using Configuration
-                myGrid.setStartingConfiguration(config);
+        for (int gen = 0; gen < numGens; gen++) {
+            for (Individual individual : population) {
+                //Initialize cellMatrix in CellGrid using Individual
+                myGrid.setStartingIndividual(individual);
                 //Get max generation for each individual after numGameGens generations
-                config.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
+                individual.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
+                LOGGER.info("The max generation for " + individual + " is " + individual.getMaxGeneration());
             }
+
+
             //Sort individuals by max generation descendently
             sortPopulation();
 
             // Selection (w/ elitism)
             //Create a new population
-            //Configuration[] newPopulation = new Configuration[popSize];
+            Individual[] newPopulation = new Individual[popSize];
             //Initialize new population with gridHeight and gridWidth
-            //initializeNewPopulation(newPopulation);
+            initializeNewPopulation(newPopulation);
             //Clone first numElites individuals from population to new population
-            //cloneElites(newPopulation);
+            cloneElites(newPopulation);
             //Shuffle remaining individuals in the new population and find the max generation, then
             //make remaining equal to it
-            //selectRemainingIndividuals(numElites, newPopulation);
+            selectRemainingIndividuals(numElites, newPopulation);
             //Save the new population into population
-            //saveNewPopulation(newPopulation);
+            saveNewPopulation(newPopulation);
 
             // Apply chance for mutation
+            for (int i = 0; i < newPopulation.length; i++) {
+                newPopulation[i].mutation(mutationChance);
+            }
             //Implement mutation and crossover based on mutationChance and crossoverChance
-            //applyVariationOperators(numElites/2, mutationChance, crossoverChance);
+            applyVariationOperators(numElites / 2, mutationChance);
 
+        }
 
-        /*for (Configuration config: population) {
-            //Initialize cellMatrix
-            myGrid.setStartingConfiguration(config);
-            //Get max generation for each individual after numGameGens generations
-            config.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
-        }*/
+        for (Individual individual: population) {
+            myGrid.setStartingIndividual(individual);
+            individual.setMaxGeneration(myGrid.runGame(MAX_GENERATION));
+            LOGGER.info("The max generation(new population) for "+individual+" is "+individual.getMaxGeneration());
+        }
 
         //Find the best individual
-        Configuration bestConfig = population[0];//findBestConfiguration();
-        return bestConfig;
+        Individual bestIndividual = findBestIndividual();
+        return bestIndividual;
     }
 
     /**
      * Clone certain number of individuals according to max generation
      * @param newPopulation
      */
-    private void cloneElites(Configuration[] newPopulation) {
+    private void cloneElites(Individual[] newPopulation) {
         sortPopulation();
         for (int i = 0; i < numElites; i++) {
             newPopulation[i].deepCopy(population[i]);
@@ -146,20 +124,21 @@ public class EvolutionaryAgent {
      * @param startingIndex
      * @param newPopulation
      */
-    private void selectRemainingIndividuals(int startingIndex, Configuration[] newPopulation) {
+    private void selectRemainingIndividuals(int startingIndex, Individual[] newPopulation) {
         for (int i = startingIndex; i < popSize; i++) {
             shufflePopulation(startingIndex);
-            Configuration bestConfig = population[0];
+            Individual bestIndividual = population[0];
             for (int j = 0; j < tournamentSize; j++) {
-                if (bestConfig.getMaxGeneration() < population[j].getMaxGeneration()) {
-                    bestConfig.deepCopy(population[j]);
-                }
+                int randInt = randGen.nextInt(population.length-startingIndex)+startingIndex;
+               // if (bestIndividual.getMaxGeneration() < population[randInt].getMaxGeneration()) {
+                    bestIndividual.deepCopy(population[randInt]);
+               // }
             }
-            newPopulation[i].deepCopy(bestConfig);
+            newPopulation[i].deepCopy(bestIndividual);
         }
     }
 
-    private void saveNewPopulation(Configuration[] newPopulation) {
+    private void saveNewPopulation(Individual[] newPopulation) {
         for (int i = 0; i < popSize; i++) {
             population[i].deepCopy(newPopulation[i]);
         }
@@ -170,7 +149,7 @@ public class EvolutionaryAgent {
      */
     public void sortPopulation() {
         Arrays.asList(population);
-        List<Configuration> popList = new ArrayList<Configuration>(Arrays.asList(population));
+        List<Individual> popList = new ArrayList<Individual>(Arrays.asList(population));
         Collections.sort(popList);
         population = popList.toArray(population);
         LOGGER.info("Sort population successfully");
@@ -178,50 +157,24 @@ public class EvolutionaryAgent {
     }
 
 
-    private Configuration findBestConfiguration() {
-        Configuration bestConfig = population[0];
-        for (Configuration config : population) {
-            if (bestConfig.getMaxGeneration() < config.getMaxGeneration()) {
-                bestConfig = config;
+    private Individual findBestIndividual() {
+        Individual bestIndividual = population[0];
+        for (Individual individual : population) {
+            if (bestIndividual.getMaxGeneration() < individual.getMaxGeneration()) {
+                bestIndividual = individual;
             }
         }
-        return bestConfig;
+        return bestIndividual;
     }
 
     /**
      * Implement mutation and crossover of all individuals in the population
      * @param startingInd
      * @param mutationChance
-     * @param crossoverChance
      */
-    private void applyVariationOperators(int startingInd, int mutationChance, int crossoverChance) {
+    private void applyVariationOperators(int startingInd, int mutationChance) {
         for (int i = startingInd; i < popSize; i++) {
             population[i].mutation(mutationChance);
-        }
-        crossover(startingInd, crossoverChance);
-    }
-
-    private void crossover(int startingInd, int crossoverChance) {
-        shufflePopulation(startingInd);
-
-        for (int i = startingInd; i < (popSize - startingInd)/2; i++) {
-            int randChance = randGen.nextInt(100);
-            if (randChance < crossoverChance) {
-                int rowInd1 = randGen.nextInt(gridHeight);
-                int rowInd2 = randGen.nextInt(gridHeight);
-                int colInd1 = randGen.nextInt(gridWidth);
-                int colInd2 = randGen.nextInt(gridWidth);
-
-                int height = Math.max(rowInd1, rowInd2) - Math.min(rowInd1, rowInd2);
-                int width = Math.max(colInd1, colInd2) - Math.min(colInd1, colInd2);
-                rowInd1 = Math.min(rowInd1, rowInd2);
-                colInd1 = Math.min(colInd1, colInd2);
-
-                boolean[][] region1 = population[i].getCellRegion(rowInd1, colInd1, height, width);
-                boolean[][] region2 = population[i + (popSize - startingInd)/ 2].getCellRegion(rowInd1, colInd1, height, width);
-                population[i].setCellRegion(rowInd1, colInd1, height, width, region2);
-                population[i + (popSize - startingInd)/ 2].setCellRegion(rowInd1, colInd1, height, width, region1);
-            }
         }
     }
 
@@ -232,7 +185,7 @@ public class EvolutionaryAgent {
     private void shufflePopulation(int startingInd) {
         for (int i = startingInd; i < popSize; i++) {
             int newIndex = randGen.nextInt(popSize-startingInd) + startingInd;
-            Configuration temp = population[newIndex];
+            Individual temp = population[newIndex];
             population[newIndex] = population[i];
             population[i] = temp;
         }

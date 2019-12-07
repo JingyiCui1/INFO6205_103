@@ -1,7 +1,7 @@
 package ui;
 
-import model.Configuration;
 import model.EvolutionaryAgent;
+import model.Individual;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ public class GameOfLifeFrame extends JFrame {
 
     private JPanel[][] pnMatrix;
 
-    private Configuration bestPattern;
+    private Individual bestPattern;
     private EvolutionaryAgent myAgent;
 
     private HashMap<String,Integer> generationTable;
@@ -56,8 +56,13 @@ public class GameOfLifeFrame extends JFrame {
 
         myAgent = new EvolutionaryAgent();
         bestPattern = myAgent.evolvePattern();
+        try{
+            Thread.sleep(5000);
+        }catch(Exception e){
+            e.getStackTrace();
+        }
         LOGGER.info("Best pattern of this population:");
-        myAgent.myGrid.printMatrix(bestPattern.getConfigMatrix());
+        myAgent.myGrid.printMatrix(bestPattern.getIndividualMatrix());
 
         initGridLayout();
         showMatrix();
@@ -71,7 +76,7 @@ public class GameOfLifeFrame extends JFrame {
 
     private void showMatrix() {
 
-        boolean[][] matrix = bestPattern.getConfigMatrix();
+        boolean[][] matrix = bestPattern.getIndividualMatrix();
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[0].length; x++) {
                 if (matrix[y][x]) {
@@ -126,17 +131,10 @@ public class GameOfLifeFrame extends JFrame {
         public void run() {
 
 
-            myAgent.myGrid.setStartingConfiguration(bestPattern);
+            myAgent.myGrid.setStartingIndividual(bestPattern);
 
             while(!stop){
                 boolean[][] oldMatrix = myAgent.myGrid.getCellMatrix();
-                /*boolean[][] temp=new boolean[22][22];
-                for(int i=0;i<oldMatrix.length;i++) {
-                    for (int j = 0; j < oldMatrix.length; j++) {
-                          temp[i][j]=oldMatrix[i][j];
-                    }
-                }*/
-
 
                 showMatrix2();
                 myAgent.myGrid.nextGen();
@@ -187,7 +185,7 @@ public class GameOfLifeFrame extends JFrame {
 
 
                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(1000);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
