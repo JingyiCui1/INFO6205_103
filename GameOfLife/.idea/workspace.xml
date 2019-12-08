@@ -60,7 +60,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="JUnit.IndividualTest">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="GameOfLife" />
@@ -97,9 +97,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
-        <item itemvalue="JUnit.CellGridTest" />
         <item itemvalue="JUnit.IndividualTest" />
+        <item itemvalue="JUnit.CellGridTest" />
+        <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.ConfigurationTest" />
       </list>
     </recent_temporary>
@@ -128,7 +128,7 @@
       <workItem from="1574787926849" duration="29107000" />
       <workItem from="1575341709830" duration="11346000" />
       <workItem from="1575639557736" duration="16658000" />
-      <workItem from="1575724965362" duration="9993000" />
+      <workItem from="1575724965362" duration="12554000" />
     </task>
     <servers />
   </component>

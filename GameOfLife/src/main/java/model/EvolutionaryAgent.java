@@ -24,13 +24,13 @@ public class EvolutionaryAgent{
 
     private int liveChance = 40;
     private int mutationChance = 5;
-    private int crossoverChance = 5;
     private final int MAX_GENERATION = 1000;//it should be 10000, but it will take a long time to run the project
     private static final Logger LOGGER = Logger.getLogger(EvolutionaryAgent.class);
 
     public EvolutionaryAgent() {
         myGrid = new CellGrid(gridHeight, gridWidth);
         generateStartingPopulation();
+        //randGen.setSeed(10);
     }
 
 
@@ -75,25 +75,17 @@ public class EvolutionaryAgent{
             //Sort individuals by max generation descendently
             sortPopulation();
 
-            // Selection (w/ elitism)
-            //Create a new population
+            // Selection
             Individual[] newPopulation = new Individual[popSize];
-            //Initialize new population with gridHeight and gridWidth
             initializeNewPopulation(newPopulation);
-            //Clone first numElites individuals from population to new population
             cloneElites(newPopulation);
-            //Shuffle remaining individuals in the new population and find the max generation, then
-            //make remaining equal to it
             selectRemainingIndividuals(numElites, newPopulation);
-            //Save the new population into population
             saveNewPopulation(newPopulation);
 
             // Apply chance for mutation
             for (int i = 0; i < newPopulation.length; i++) {
                 newPopulation[i].mutation(mutationChance);
             }
-            //Implement mutation and crossover based on mutationChance and crossoverChance
-            applyVariationOperators(numElites / 2, mutationChance);
 
         }
 
@@ -130,9 +122,8 @@ public class EvolutionaryAgent{
             Individual bestIndividual = population[0];
             for (int j = 0; j < tournamentSize; j++) {
                 int randInt = randGen.nextInt(population.length-startingIndex)+startingIndex;
-               // if (bestIndividual.getMaxGeneration() < population[randInt].getMaxGeneration()) {
-                    bestIndividual.deepCopy(population[randInt]);
-               // }
+                bestIndividual.deepCopy(population[randInt]);
+
             }
             newPopulation[i].deepCopy(bestIndividual);
         }
@@ -167,16 +158,6 @@ public class EvolutionaryAgent{
         return bestIndividual;
     }
 
-    /**
-     * Implement mutation and crossover of all individuals in the population
-     * @param startingInd
-     * @param mutationChance
-     */
-    private void applyVariationOperators(int startingInd, int mutationChance) {
-        for (int i = startingInd; i < popSize; i++) {
-            population[i].mutation(mutationChance);
-        }
-    }
 
     /**
      * Shuffle individuals randomly

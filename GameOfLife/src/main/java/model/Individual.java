@@ -15,12 +15,14 @@ public class Individual implements Comparable<Individual>{
         this.matrixHeight = matrixHeight;
         this.matrixWidth = matrixWidth;
         individualMatrix = new boolean[matrixHeight][matrixWidth];
+        //randGen.setSeed(10);
     }
 
     public Individual(boolean[][] matrix){
         this.matrixHeight = matrix.length;
         this.matrixWidth = matrix[0].length;
         individualMatrix = matrix;
+        //randGen.setSeed(10);
     }
 
     public int getMaxGeneration() {
